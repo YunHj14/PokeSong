@@ -39,6 +39,7 @@ body {
 .camera-lens {
   width: 45px;
   height: 45px;
+  flex-shrink: 0; /* 가로가 좁아져도 원형 비율 유지 */
   background: radial-gradient(circle at 30% 30%, #6ce5ff, #0077b6);
   border: 4px solid #fff;
   border-radius: 50%;
@@ -48,6 +49,7 @@ body {
 .status-lights {
   display: flex;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .light {
@@ -78,6 +80,8 @@ body {
   color: #fff;
   border: none;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0; 
   padding: 8px 14px;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -323,7 +327,47 @@ body {
 }
 
 @media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .pokedex-header {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .camera-lens {
+    width: 36px;
+    height: 36px;
+    border-width: 3px;
+  }
+
+  /* 윗줄 우측 끝에 '메인 도감으로' 버튼 고정 */
+  .back-btn {
+    margin-left: auto;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  /* 아랫줄에 제목과 부제목을 가로 100%로 배치 */
+  .pokedex-header h1 {
+    order: 3;
+    width: 100%;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .pokedex-header h1 small {
+    margin-left: 0;
+    font-size: 0.8rem;
+  }
+
   .pokedex-body {
     grid-template-columns: 1fr;
+    padding: 15px;
   }
 }
