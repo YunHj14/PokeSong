@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>포켓몬 사운드 도감 - 애니메이션 OST</title>
+  <link rel="stylesheet" href="css/ost.css">
+</head>
+<body>
+  <div class="pokedex-container">
+    <!-- 상단 도감 헤더 -->
+    <header class="pokedex-header">
+      <div class="camera-lens"></div>
+      <div class="status-lights">
+        <span class="light red"></span>
+        <span class="light yellow"></span>
+        <span class="light green"></span>
+      </div>
+      <h1>POKÉ-SOUNDEX <small>애니메이션 OST 도감</small></h1>
+      <button type="button" onclick="history.back()" class="back-btn">메인 도감으로</button>
+    </header>
+
+    <!-- 시리즈 필터 탭 -->
+    <nav class="filter-bar">
+      <button class="filter-btn active" data-series="ALL">전체 (47)</button>
+      <button class="filter-btn" data-series="무인편">무인편</button>
+      <button class="filter-btn" data-series="AG">AG</button>
+      <button class="filter-btn" data-series="DP">DP</button>
+      <button class="filter-btn" data-series="베스트위시">베스트위시</button>
+      <button class="filter-btn" data-series="XY">XY</button>
+      <button class="filter-btn" data-series="XY&Z">XY&Z</button>
+      <button class="filter-btn" data-series="썬&문">썬&문</button>
+      <button class="filter-btn" data-series="W">W</button>
+      <button class="filter-btn" data-series="W:내 꿈은 포켓몬마스터">W:내 꿈은 포켓몬마스터</button>
+    </nav>
+
+    <!-- 메인 도감 본체 (좌: 플레이어 / 우: 트랙 리스트) -->
+    <main class="pokedex-body">
+      <!-- 좌측: 현재 재생 중인 OST 정보 및 컨트롤러 -->
+      <section class="player-screen">
+        <div class="screen-frame">
+          <div class="track-header">
+            <span id="current-no">No. 001</span>
+            <span id="current-series" class="badge">무인편</span>
+          </div>
+          
+          <div class="disc-wrapper">
+            <div class="pokeball-disc" id="disc">
+              <div class="disc-center"></div>
+            </div>
+          </div>
+
+          <h2 id="current-title">모험의 시작</h2>
+          <p id="current-type" class="track-type-label">#오프닝</p>
+
+          <!-- 재생 진행바 -->
+          <div class="progress-container">
+            <span id="current-time">0:00</span>
+            <input type="range" id="progress-bar" value="0" min="0" max="100">
+            <span id="duration-time">0:00</span>
+          </div>
+
+          <!-- 컨트롤 버튼 -->
+          <div class="controls">
+            <button id="prev-btn" title="이전 곡">⏮</button>
+            <button id="play-btn" class="play-main" title="재생/일시정지">▶</button>
+            <button id="next-btn" title="다음 곡">⏭</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 우측: OST 도감 목록 -->
+      <section class="track-list-section">
+        <ul id="ost-list" class="ost-list">
+          <!-- JS로 동적 렌더링 -->
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <!-- 화면에 보이지 않는 YouTube 백그라운드 플레이어 -->
+  <div style="position: fixed; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; overflow: hidden;">
+    <div id="youtube-player"></div>
+  </div>
+
+  <!-- YouTube IFrame API 로드 -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="js/ostData.js"></script>
+  <script src="js/ostPlayer.js"></script>
+</body>
+</html>
