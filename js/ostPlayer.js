@@ -15,6 +15,8 @@ const progressBar = document.getElementById("progress-bar");
 const currentTimeEl = document.getElementById("current-time");
 const durationTimeEl = document.getElementById("duration-time");
 const filterBtns = document.querySelectorAll(".filter-btn");
+const PLAY_ICON = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+const PAUSE_ICON = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
 let filteredList = [...ostList];
 let currentTrackId = ostList[0].id;
@@ -56,11 +58,11 @@ window.onYouTubeIframeAPIReady = function () {
 function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
     isPlaying = true;
-    playBtn.textContent = "⏸";
+    playBtn.innerHTML = PAUSE_ICON;
     discEl.classList.add("playing");
   } else if (event.data === YT.PlayerState.PAUSED) {
     isPlaying = false;
-    playBtn.textContent = "▶";
+    playBtn.innerHTML = PLAY_ICON;
     discEl.classList.remove("playing");
   } else if (event.data === YT.PlayerState.ENDED) {
     nextBtn.click();
@@ -124,7 +126,7 @@ function loadTrackById(id, autoPlay = true) {
   if (autoPlay) {
     ytPlayer.loadVideoById(track.videoId);
     isPlaying = true;
-    playBtn.textContent = "⏸";
+    playBtn.innerHTML = PAUSE_ICON;
     discEl.classList.add("playing");
   } else {
     ytPlayer.cueVideoById(track.videoId);
@@ -139,7 +141,7 @@ function playAudio() {
 
   ytPlayer.playVideo();
   isPlaying = true;
-  playBtn.textContent = "⏸";
+  playBtn.innerHTML = PAUSE_ICON;
   discEl.classList.add("playing");
 }
 
@@ -148,7 +150,7 @@ function pauseAudio() {
     ytPlayer.pauseVideo();
   }
   isPlaying = false;
-  playBtn.textContent = "▶";
+  playBtn.innerHTML = PLAY_ICON;
   discEl.classList.remove("playing");
 }
 
