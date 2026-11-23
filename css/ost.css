@@ -1,0 +1,329 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background-color: #1e2229;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* 포켓몬 도감 외형 */
+.pokedex-container {
+  width: 100%;
+  max-width: 960px;
+  background-color: #dc0a2d;
+  border-radius: 20px;
+  border: 4px solid #8b0000;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* 상단 헤더 */
+.pokedex-header {
+  display: flex;
+  align-items: center;
+  padding: 18px 25px;
+  background-color: #c00826;
+  border-bottom: 4px solid #8b0000;
+  color: #fff;
+  gap: 15px;
+}
+
+.camera-lens {
+  width: 45px;
+  height: 45px;
+  background: radial-gradient(circle at 30% 30%, #6ce5ff, #0077b6);
+  border: 4px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(108, 229, 255, 0.8);
+}
+
+.status-lights {
+  display: flex;
+  gap: 6px;
+}
+
+.light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #333;
+}
+.light.red { background-color: #ff595e; }
+.light.yellow { background-color: #ffca3a; }
+.light.green { background-color: #8ac926; }
+
+.pokedex-header h1 {
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  flex-grow: 1;
+}
+
+.pokedex-header h1 small {
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.9;
+  margin-left: 8px;
+}
+
+.back-btn {
+  background-color: #2b2d42;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+.back-btn:hover { background-color: #1a1b29; }
+
+/* 필터 탭 */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 25px;
+  background-color: #b00722;
+}
+
+.filter-btn {
+  background-color: #fff;
+  color: #333;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn.active, .filter-btn:hover {
+  background-color: #ffcb05;
+  color: #1d2c5e;
+}
+
+/* 메인 컨텐츠 영역 (좌우 너비 1:1.1 비율 엄격 고정) */
+.pokedex-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 20px;
+  padding: 25px;
+  align-items: stretch;
+}
+
+/* 좌측 스크린 프레임 (높이 460px로 우측 리스트와 완전 일치) */
+.player-screen {
+  display: flex;
+  flex-direction: column;
+  height: 460px;
+}
+
+.screen-frame {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #e3f2fd;
+  border: 12px solid #dedede;
+  border-radius: 15px;
+  padding: 22px 20px;
+  text-align: center;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.track-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: #1d2c5e;
+  height: 28px;
+}
+
+.badge {
+  background-color: #3b4cca;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* 몬스터볼 LP 디스크 */
+.disc-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.pokeball-disc {
+  width: 145px;
+  height: 145px;
+  border-radius: 50%;
+  border: 5px solid #222;
+  background: linear-gradient(to bottom, #ee1515 0%, #ee1515 47%, #222 47%, #222 53%, #fff 53%, #fff 100%);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+.pokeball-disc.playing {
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.disc-center {
+  width: 36px;
+  height: 36px;
+  background-color: #fff;
+  border: 5px solid #222;
+  border-radius: 50%;
+}
+
+/* 곡 제목: 길이가 짧든 길든 항상 2줄 높이(3.5rem)로 고정해 레이아웃 흔들림 방지 */
+#current-title {
+  font-size: 1.25rem;
+  line-height: 1.35;
+  height: 3.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #111;
+  margin-bottom: 4px;
+  word-break: keep-all;
+  overflow: hidden;
+}
+
+.track-type-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #3b4cca;
+  margin-bottom: 18px;
+}
+
+/* 프로그레스 바 */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #333;
+  margin-bottom: 18px;
+}
+
+#progress-bar {
+  flex-grow: 1;
+  cursor: pointer;
+  accent-color: #dc0a2d;
+}
+
+/* 재생 컨트롤 버튼 */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.controls button {
+  background-color: #2b2d42;
+  color: #fff;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.controls button:active { transform: scale(0.92); }
+.controls .play-main {
+  background-color: #dc0a2d;
+  width: 52px;
+  height: 52px;
+  font-size: 1.2rem;
+}
+
+/* 우측 트랙 리스트 */
+.track-list-section {
+  background-color: #1e2229;
+  border-radius: 12px;
+  padding: 15px;
+  border: 3px solid #8b0000;
+  height: 460px;
+  overflow-y: auto;
+}
+
+.ost-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ost-item {
+  background-color: #2c313c;
+  color: #fff;
+  padding: 12px 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-left: 5px solid transparent;
+  transition: all 0.2s;
+}
+
+.ost-item:hover {
+  background-color: #383e4c;
+}
+
+.ost-item.active {
+  background-color: #3b4cca;
+  border-left-color: #ffcb05;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.item-no {
+  font-size: 0.75rem;
+  color: #ffcb05;
+  font-weight: bold;
+}
+
+.item-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.item-tag {
+  font-size: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+  .pokedex-body {
+    grid-template-columns: 1fr;
+  }
+}
