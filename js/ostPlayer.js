@@ -11,26 +11,35 @@ const currentTypeEl = document.getElementById("current-type");
 const playBtn = document.getElementById("play-btn");
 const prevBtn = document.getElementById("prev-btn");
 const nextBtn = document.getElementById("next-btn");
+const shuffleBtn = document.getElementById("shuffle-btn");
+const repeatBtn = document.getElementById("repeat-btn");
 const progressBar = document.getElementById("progress-bar");
 const currentTimeEl = document.getElementById("current-time");
 const durationTimeEl = document.getElementById("duration-time");
 const filterBtns = document.querySelectorAll(".filter-btn");
+
+// SVG 아이콘 상수
 const PLAY_ICON = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
 const PAUSE_ICON = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+const REPEAT_ALL_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>`;
+const REPEAT_ONE_ICON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/></svg>`;
 
 let filteredList = [...ostList];
 let currentTrackId = ostList[0].id;
 let isPlaying = false;
+let isShuffle = false;
+let repeatMode = 0; // 0: 반복 끄기, 1: 현재 리스트 반복, 2: 현재 곡 무한반복
+
 let ytPlayer = null;
 let isPlayerReady = false;
 let progressTimer = null;
 
-// YouTube IFrame API 준비 완료 시 자동 호출되는 전역 함수
+// YouTube IFrame API 준비 완료 시 자동 호출
 window.onYouTubeIframeAPIReady = function () {
   const firstTrack = ostList[0];
   ytPlayer = new YT.Player("youtube-player", {
-    height: "1",
-    width: "1",
+    height: "200",
+    width: "200",
     videoId: firstTrack.videoId || "",
     playerVars: {
       autoplay: 0,
@@ -47,7 +56,7 @@ window.onYouTubeIframeAPIReady = function () {
       onError: () => {
         console.warn("외부 재생이 제한된 영상이거나 videoId가 비어 있습니다. 다음 곡으로 이동합니다.");
         if (isPlaying) {
-          nextBtn.click();
+          playNextTrack(true);
         }
       }
     }
@@ -65,8 +74,56 @@ function onPlayerStateChange(event) {
     playBtn.innerHTML = PLAY_ICON;
     discEl.classList.remove("playing");
   } else if (event.data === YT.PlayerState.ENDED) {
-    nextBtn.click();
+    handleTrackEnded();
   }
+}
+
+// 곡이 끝났을 때 반복 모드에 따른 처리
+function handleTrackEnded() {
+  if (repeatMode === 2) {
+    // 현재 곡 무한반복
+    if (isPlayerReady && ytPlayer) {
+      ytPlayer.seekTo(0, true);
+      ytPlayer.playVideo();
+    }
+    return;
+  }
+  playNextTrack(false);
+}
+
+// 다음 곡 이동 로직 (isManualClick: 사용자가 직접 다음 버튼을 눌렀는지 여부)
+function playNextTrack(isManualClick = false) {
+  const activeList = filteredList.length > 0 ? filteredList : ostList;
+
+  // 셔플 모드일 때
+  if (isShuffle) {
+    if (activeList.length === 1) {
+      loadTrackById(activeList[0].id, true);
+      return;
+    }
+    const candidates = activeList.filter((item) => item.id !== currentTrackId);
+    const randomTrack = candidates[Math.floor(Math.random() * candidates.length)];
+    loadTrackById(randomTrack.id, true);
+    return;
+  }
+
+  const idx = activeList.findIndex((item) => item.id === currentTrackId);
+  const isLastTrack = idx === activeList.length - 1;
+
+  // 자동 종료 시 마지막 곡이고 '반복 끄기(0)' 상태라면 정지
+  if (!isManualClick && isLastTrack && repeatMode === 0) {
+    pauseAudio();
+    if (isPlayerReady && ytPlayer) {
+      ytPlayer.seekTo(0, true);
+      ytPlayer.pauseVideo();
+    }
+    progressBar.value = 0;
+    currentTimeEl.textContent = "0:00";
+    return;
+  }
+
+  const nextIdx = idx === -1 ? 0 : (idx + 1) % activeList.length;
+  loadTrackById(activeList[nextIdx].id, true);
 }
 
 // 초기 실행
@@ -159,7 +216,33 @@ playBtn.addEventListener("click", () => {
   isPlaying ? pauseAudio() : playAudio();
 });
 
-// 이전/다음 곡 (현재 필터된 리스트 기준 이동)
+// 셔플 버튼 토글
+shuffleBtn.addEventListener("click", () => {
+  isShuffle = !isShuffle;
+  shuffleBtn.classList.toggle("active", isShuffle);
+  shuffleBtn.title = isShuffle ? "셔플 재생: 켜짐" : "셔플 재생: 꺼짐";
+});
+
+// 반복 버튼 3단계 순환 (0: 끄기 -> 1: 리스트 반복 -> 2: 현재 곡 무한반복)
+repeatBtn.addEventListener("click", () => {
+  repeatMode = (repeatMode + 1) % 3;
+
+  if (repeatMode === 0) {
+    repeatBtn.classList.remove("active");
+    repeatBtn.innerHTML = REPEAT_ALL_ICON;
+    repeatBtn.title = "반복: 끄기";
+  } else if (repeatMode === 1) {
+    repeatBtn.classList.add("active");
+    repeatBtn.innerHTML = REPEAT_ALL_ICON;
+    repeatBtn.title = "반복: 현재 리스트 전체 반복";
+  } else {
+    repeatBtn.classList.add("active");
+    repeatBtn.innerHTML = REPEAT_ONE_ICON;
+    repeatBtn.title = "반복: 현재 곡 무한반복";
+  }
+});
+
+// 이전/다음 곡 버튼
 prevBtn.addEventListener("click", () => {
   const activeList = filteredList.length > 0 ? filteredList : ostList;
   const idx = activeList.findIndex((item) => item.id === currentTrackId);
@@ -168,10 +251,7 @@ prevBtn.addEventListener("click", () => {
 });
 
 nextBtn.addEventListener("click", () => {
-  const activeList = filteredList.length > 0 ? filteredList : ostList;
-  const idx = activeList.findIndex((item) => item.id === currentTrackId);
-  const nextIdx = idx === -1 ? 0 : (idx + 1) % activeList.length;
-  loadTrackById(activeList[nextIdx].id, true);
+  playNextTrack(true);
 });
 
 // 0.5초마다 재생 시간 & 프로그레스 바 동기화
